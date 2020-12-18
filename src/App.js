@@ -4,25 +4,22 @@ import {useState, useEffect} from "react";
 
 import StoryList from "./components/StoryList";
 
-function App() {
+function App() { // Container for the articleIds and stories state
 
   const [articleIds, setArticleIds] = useState([]);
   const [stories, setStories] = useState([]);
 
   const fetchStoryData = (storyIds, numStories) => {
-    // take off the first 4 id's
-    const topFour = storyIds.slice(0, numStories);
-    // with the 4 id's loop over them
+    // take off the first numStories id's
+    const topStories = storyIds.slice(0, numStories);
 
     // map every url to the promise of the fetch
-    let promises = topFour.map(url => fetch(`https://hacker-news.firebaseio.com/v0/item/${url}.json`));
-    
+    let promises = topStories.map(storyId => fetch(`https://hacker-news.firebaseio.com/v0/item/${storyId}.json`));
+    console.log(promises);
     // Promise.all to waits until all promises are resolved
-    Promise.all(promises)
-      .then(responses =>  responses)
+    Promise.all(promises) //accepts an array of promises
       .then(responses => Promise.all(responses.map(r => r.json())))
-      .then(stories => setStories(stories))
-    
+      .then(stories => setStories(stories));
   }
 
   useEffect(()=>{
@@ -31,9 +28,10 @@ function App() {
     .then((data)=>{
       setArticleIds(data);
     });
+
   },[]);
 
-  useEffect(()=>{
+  useEffect(()=>{ // watches a part of your state (a single state variable)
     fetchStoryData(articleIds, 10);
   },[articleIds])
 
